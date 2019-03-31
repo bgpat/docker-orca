@@ -1,0 +1,30 @@
+version: "3"
+services:
+  orca:
+    build: .
+    environment:
+      DBNAME: orca
+      DBHOST: db
+      DBPORT: 5432
+      DBUSER: orca
+      DBPASS: orca
+      PGUSER: orca
+      PGPASS: orca
+      DBENCODING: UTF-8
+    ports:
+    - 8000:8000
+    volumes:
+    - run:/run
+    depends_on:
+    - db
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: orca
+      POSTGRES_USER: orca
+      POSTGRES_PASSWORD: orca
+    volumes:
+    - ./data:/var/lib/postgresql/data
+    - run:/run
+volumes:
+  run:
