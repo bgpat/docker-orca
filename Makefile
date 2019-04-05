@@ -24,8 +24,8 @@ passwd: db
 	docker-compose run --rm orca psql -U $(DBUSER) -c "INSERT INTO tbl_passwd VALUES ('ormaster', crypt('$$DBPASS', gen_salt('md5'))) ON CONFLICT (userid) DO UPDATE SET password = crypt('$$DBPASS', gen_salt('md5'))"
 
 restore: restore/*.dump clean db
-	COMPOSE_INTERACTIVE_NO_CLI=1 \
-	docker-compose exec db find /tmp/restore -name '*.dump' -exec pg_restore -Fc -x -O -U $(DBUSER) -d $(DBNAME) {} \;
+	docker-compose run --rm orca psql -U $(DBUSER) -c "DROP SCHEMA public"
+	COMPOSE_INTERACTIVE_NO_CLI=1 docker-compose exec db find /tmp/restore -name '*.dump' -exec pg_restore -Fc -x -O -U $(DBUSER) -d $(DBNAME) {} \;
 
 data:
 	mkdir data
