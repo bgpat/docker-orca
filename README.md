@@ -16,7 +16,7 @@ make
 ### Restore from DB dump
 
 ```bash
-# copy your dump file (*.sql) to ./restore
+# copy your dump file (*.dump) to ./restore
 cp my_backup.dump restore/my_backup.dump
 
 # start restoring
