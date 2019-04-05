@@ -1,7 +1,8 @@
 version: "3"
 services:
   orca:
-    build: .
+    image: bgpat/orca
+#   build: .
     environment:
       DBNAME: orca
       DBHOST: db
@@ -25,6 +26,7 @@ services:
       POSTGRES_PASSWORD: orca
     volumes:
     - ./data:/var/lib/postgresql/data
+    - ./restore:/tmp/restore:ro
     - run:/run
 volumes:
   run:

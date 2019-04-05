@@ -1,19 +1,31 @@
-PASSWD = password
+DBUSER := orca
+DBNAME := orca
 
-.PHONY: run setup db passwd
+.PHONY: run setup init db passwd restore clean
 
-run: setup passwd
+run: setup
 	docker-compose up --build orca
 
 setup: db
-	docker-compose run orca jma-setup
+	docker-compose run --rm orca jma-setup
+
+init: passwd
 
 db: data
 	docker-compose up -d db
-	docker-compose exec db psql -U orca -c "CREATE EXTENSION IF NOT EXISTS pgcrypto"
+	@until docker-compose exec db psql -U $(DBUSER) -c "SELECT 1" > /dev/null 2>&1; do \
+		echo "Waiting for postgres server..." ; \
+		sleep 1 ; \
+	done
 
 passwd: db
-	@docker-compose run orca psql -U orca orca -c "INSERT INTO tbl_passwd VALUES ('ormaster', crypt('$(PASSWD)', gen_salt('md5'))) ON CONFLICT (userid) DO UPDATE SET password = crypt('$(PASSWD)', gen_salt('md5'))"
+	docker-compose exec db psql -U $(DBUSER) -c "CREATE EXTENSION IF NOT EXISTS pgcrypto"
+	@read -s -p "password: " DBPASS; \
+	docker-compose run --rm orca psql -U $(DBUSER) -c "INSERT INTO tbl_passwd VALUES ('ormaster', crypt('$$DBPASS', gen_salt('md5'))) ON CONFLICT (userid) DO UPDATE SET password = crypt('$$DBPASS', gen_salt('md5'))"
+
+restore: restore/*.dump clean db
+	COMPOSE_INTERACTIVE_NO_CLI=1 \
+	docker-compose exec db find /tmp/restore -name '*.dump' -exec pg_restore -Fc -x -O -U $(DBUSER) -d $(DBNAME) {} \;
 
 data:
 	mkdir data
