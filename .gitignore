@@ -1,1 +1,3 @@
 data/
+restore/*
+!restore/.gitkeep
