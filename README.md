@@ -1,6 +1,6 @@
 # docker-orca
 
-![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/bgpat/orca.svg)
+[![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/bgpat/orca.svg)](https://hub.docker.com/r/bgpat/orca)
 
 Docker image for [ORCA](https://www.orca.med.or.jp/receipt/)
 
